@@ -11,10 +11,12 @@ const LOCAL_REPO_PATH: &str = "/var/lib/solbuild/local";
 fn copy_packages(current_dir: PathBuf) -> Result<(), Box<dyn Error>> {
     let mut packages = Vec::new();
 
-    let search = format!("{}/*.eopkg", current_dir.to_str().unwrap());
+    println!("Looking for packages to copy...");
+    let search = format!("{}/*.eopkg", current_dir.to_str().unwrap_or("."));
     for entry in glob(&search).unwrap() {
         match entry {
             Ok(path) => {
+                println!("Found package: {}", path.file_name().unwrap().to_str().unwrap());
                 packages.push(path);
             },
             Err(e) => return Err(Box::new(e)),
@@ -69,6 +71,8 @@ fn main() -> Result<(), Box<dyn Error>> {
                 eprintln!("Error copying packages to local repo: {}", e);
                 process::exit(1);
             }
+
+            println!("");
 
             if let Err(e) = index_repo() {
                 eprintln!("Error indexing local repo: {}", e);
