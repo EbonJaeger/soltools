@@ -1,13 +1,16 @@
 use fs_extra::copy_items;
 use fs_extra::dir::CopyOptions;
+use fs_extra::remove_items;
 use glob::glob;
-use std::{error::Error, path::PathBuf};
 use std::env;
 use std::process;
 use std::process::Command;
+use std::{error::Error, path::PathBuf};
 
 const LOCAL_REPO_PATH: &str = "/var/lib/solbuild/local";
 
+/// Copies any eopkg files in the current directory to the local solbuild
+/// repo. This does not index the repo afterwards.
 fn copy_packages(current_dir: PathBuf) -> Result<(), Box<dyn Error>> {
     let mut packages = Vec::new();
 
@@ -16,9 +19,12 @@ fn copy_packages(current_dir: PathBuf) -> Result<(), Box<dyn Error>> {
     for entry in glob(&search).unwrap() {
         match entry {
             Ok(path) => {
-                println!("Found package: {}", path.file_name().unwrap().to_str().unwrap());
+                println!(
+                    "Found package: {}",
+                    path.file_name().unwrap().to_str().unwrap()
+                );
                 packages.push(path);
-            },
+            }
             Err(e) => return Err(Box::new(e)),
         }
     }
@@ -32,6 +38,28 @@ fn copy_packages(current_dir: PathBuf) -> Result<(), Box<dyn Error>> {
     }
 }
 
+/// Removes all eopkg files from the local solbuild repo. This
+/// does not index the local repo afterwards.
+fn clean_local_repo() -> Result<(), Box<dyn Error>> {
+    let mut paths = Vec::new();
+    let search = format!("{}/*.eopkg", LOCAL_REPO_PATH);
+
+    for entry in glob(&search).unwrap() {
+        match entry {
+            Ok(path) => {
+                paths.push(path);
+            }
+            Err(e) => return Err(Box::new(e)),
+        }
+    }
+
+    match remove_items(&paths) {
+        Ok(_) => Ok(()),
+        Err(e) => Err(Box::new(e)),
+    }
+}
+
+/// Indexes the packages in the local solbuild repository.
 fn index_repo() -> Result<(), Box<dyn Error>> {
     let status = Command::new("eopkg")
         .current_dir(LOCAL_REPO_PATH)
@@ -72,7 +100,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 process::exit(1);
             }
 
-            println!("");
+            println!();
 
             if let Err(e) = index_repo() {
                 eprintln!("Error indexing local repo: {}", e);
@@ -80,7 +108,22 @@ fn main() -> Result<(), Box<dyn Error>> {
             }
 
             Ok(())
-        },
+        }
+        "clean" => {
+            sudo::escalate_if_needed()?;
+
+            if let Err(e) = clean_local_repo() {
+                eprintln!("Error cleaning local repo: {}", e);
+                process::exit(1);
+            }
+
+            if let Err(e) = index_repo() {
+                eprintln!("Error indexing local repo: {}", e);
+                process::exit(1);
+            }
+
+            Ok(())
+        }
         _ => {
             eprintln!("Unknown subcommand: {}", command);
             process::exit(1);

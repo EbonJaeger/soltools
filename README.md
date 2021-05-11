@@ -2,6 +2,7 @@ A small tool to make packaging for Solus even easier.
 
 ## Features
 
+- Remove all packages from the local solbuild repo.
 - Copy eopkg files to the default local repo and re-index the repo.
 
 ## Usage
@@ -10,6 +11,7 @@ A small tool to make packaging for Solus even easier.
 
 Available subcommands:
 
+- `clean`
 - `copy`
 
 ## License
