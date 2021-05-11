@@ -46,9 +46,7 @@ fn clean_local_repo() -> Result<(), Box<dyn Error>> {
 
     for entry in glob(&search).unwrap() {
         match entry {
-            Ok(path) => {
-                paths.push(path);
-            }
+            Ok(path) => paths.push(path),
             Err(e) => return Err(Box::new(e)),
         }
     }
