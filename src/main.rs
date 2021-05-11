@@ -44,7 +44,7 @@ fn index_repo() -> Result<(), Box<dyn Error>> {
     }
 }
 
-fn main() {
+fn main() -> Result<(), Box<dyn Error>> {
     let args: Vec<String> = env::args().collect();
 
     if args.len() != 2 {
@@ -63,6 +63,8 @@ fn main() {
     let command = args[1].as_ref();
     match command {
         "copy" => {
+            sudo::escalate_if_needed()?;
+
             if let Err(e) = copy_packages(current_dir) {
                 eprintln!("Error copying packages to local repo: {}", e);
                 process::exit(1);
@@ -72,6 +74,8 @@ fn main() {
                 eprintln!("Error indexing local repo: {}", e);
                 process::exit(1);
             }
+
+            Ok(())
         },
         _ => {
             eprintln!("Unknown subcommand: {}", command);
