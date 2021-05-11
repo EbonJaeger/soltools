@@ -82,18 +82,18 @@ fn main() -> Result<(), Box<dyn Error>> {
         process::exit(1);
     }
 
-    let current_dir = match env::current_dir() {
-        Ok(dir) => dir,
-        Err(e) => {
-            eprintln!("Error getting current working directory: {}", e);
-            process::exit(1);
-        }
-    };
-
     let command = args[1].as_ref();
     match command {
         "copy" => {
             sudo::escalate_if_needed()?;
+
+            let current_dir = match env::current_dir() {
+                Ok(dir) => dir,
+                Err(e) => {
+                    eprintln!("Error getting current working directory: {}", e);
+                    process::exit(1);
+                }
+            };
 
             if let Err(e) = copy_packages(current_dir) {
                 eprintln!("Error copying packages to local repo: {}", e);
