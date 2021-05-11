@@ -1,17 +1,23 @@
+mod errors;
+
+use crate::errors::{SolError, SolResult};
+
 use fs_extra::copy_items;
 use fs_extra::dir::CopyOptions;
 use fs_extra::remove_items;
+use git2::Repository;
 use glob::glob;
-use std::env;
 use std::process;
 use std::process::Command;
+use std::{env, io::Write};
 use std::{error::Error, path::PathBuf};
+use std::{fs, fs::File};
 
 const LOCAL_REPO_PATH: &str = "/var/lib/solbuild/local";
 
 /// Copies any eopkg files in the current directory to the local solbuild
 /// repo. This does not index the repo afterwards.
-fn copy_packages(current_dir: PathBuf) -> Result<(), Box<dyn Error>> {
+fn copy_packages(current_dir: PathBuf) -> SolResult<()> {
     let mut packages = Vec::new();
 
     println!("Looking for packages to copy...");
@@ -25,7 +31,7 @@ fn copy_packages(current_dir: PathBuf) -> Result<(), Box<dyn Error>> {
                 );
                 packages.push(path);
             }
-            Err(e) => return Err(Box::new(e)),
+            Err(e) => return Err(SolError::Glob(e)),
         }
     }
 
@@ -34,31 +40,31 @@ fn copy_packages(current_dir: PathBuf) -> Result<(), Box<dyn Error>> {
 
     match copy_items(&packages, LOCAL_REPO_PATH, &options) {
         Ok(_) => Ok(()),
-        Err(e) => Err(Box::new(e)),
+        Err(e) => Err(SolError::Fs(e)),
     }
 }
 
 /// Removes all eopkg files from the local solbuild repo. This
 /// does not index the local repo afterwards.
-fn clean_local_repo() -> Result<(), Box<dyn Error>> {
+fn clean_local_repo() -> SolResult<()> {
     let mut paths = Vec::new();
     let search = format!("{}/*.eopkg", LOCAL_REPO_PATH);
 
     for entry in glob(&search).unwrap() {
         match entry {
             Ok(path) => paths.push(path),
-            Err(e) => return Err(Box::new(e)),
+            Err(e) => return Err(SolError::Glob(e)),
         }
     }
 
     match remove_items(&paths) {
         Ok(_) => Ok(()),
-        Err(e) => Err(Box::new(e)),
+        Err(e) => Err(SolError::Fs(e)),
     }
 }
 
 /// Indexes the packages in the local solbuild repository.
-fn index_repo() -> Result<(), Box<dyn Error>> {
+fn index_repo() -> SolResult<()> {
     let status = Command::new("eopkg")
         .current_dir(LOCAL_REPO_PATH)
         .arg("index")
@@ -68,14 +74,62 @@ fn index_repo() -> Result<(), Box<dyn Error>> {
 
     match status {
         Ok(_) => Ok(()),
-        Err(e) => Err(Box::new(e)),
+        Err(e) => Err(SolError::Io(e)),
+    }
+}
+
+fn init_repo(current_dir: PathBuf, name: &str, source_url: &str) -> SolResult<()> {
+    // Check that we're in the root packaging directory where `common` lives
+    let mut common_path = PathBuf::new();
+    common_path.push(&current_dir);
+    common_path.push("common");
+
+    if fs::metadata(&common_path).is_err() {
+        return Err(SolError::Other(
+            "not in packaging root directory: 'common' not found",
+        ));
+    }
+
+    // Create a new package directory
+    let mut repo_path = PathBuf::new();
+    repo_path.push(&current_dir);
+    repo_path.push(name);
+
+    if let Err(e) = fs::create_dir(&repo_path) {
+        return Err(SolError::Io(e));
+    }
+
+    // Create the repo's Makefile
+    println!("Creating package Makefile");
+    let mut makefile_path = PathBuf::new();
+    makefile_path.push(&repo_path);
+    makefile_path.push("Makefile");
+
+    let mut makefile = File::create(makefile_path)?;
+    makefile.write_all(b"include ../Makefile.common")?;
+
+    println!("\nRunning yauto.py");
+
+    // Run yauto.py to generate the package.yml
+    let yauto = format!("{}/Scripts/yauto.py", common_path.to_str().unwrap());
+    Command::new(&yauto)
+        .current_dir(&repo_path)
+        .arg(source_url)
+        .status()?;
+
+    println!("\nCreating git repo");
+
+    // Create a git repo in the new directory
+    match Repository::init(&repo_path) {
+        Ok(_) => Ok(()),
+        Err(e) => Err(SolError::Git(e)),
     }
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
     let args: Vec<String> = env::args().collect();
 
-    if args.len() != 2 {
+    if args.len() < 2 {
         eprintln!("Invalid arguments");
         process::exit(1);
     }
@@ -117,6 +171,27 @@ fn main() -> Result<(), Box<dyn Error>> {
 
             if let Err(e) = index_repo() {
                 eprintln!("Error indexing local repo: {}", e);
+                process::exit(1);
+            }
+
+            Ok(())
+        }
+        "init" => {
+            if args.len() != 4 {
+                eprintln!("Invalid arguments. Usage: soltools init NAME URL");
+                process::exit(1);
+            }
+
+            let current_dir = match env::current_dir() {
+                Ok(dir) => dir,
+                Err(e) => {
+                    eprintln!("Error getting current working directory: {}", e);
+                    process::exit(1);
+                }
+            };
+
+            if let Err(e) = init_repo(current_dir, &args[2], &args[3]) {
+                eprintln!("Error creating new repo: {}", e);
                 process::exit(1);
             }
 
