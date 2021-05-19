@@ -5,6 +5,7 @@ A small tool to make packaging for Solus even easier.
 - Remove all packages from the local solbuild repo.
 - Copy eopkg files to the default local repo and re-index the repo.
 - Initialize a new package repo
+- Clone an existing package repo
 
 ## Usage
 
@@ -15,6 +16,7 @@ Available subcommands:
 - `clean`
 - `copy`
 - `init NAME SOURCE_ARCHIVE_URL`
+- `clone NAME`
 
 ## License
 

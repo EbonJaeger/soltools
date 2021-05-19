@@ -10,19 +10,21 @@ use glob::glob;
 use std::process;
 use std::process::Command;
 use std::{env, io::Write};
-use std::{error::Error, path::PathBuf};
+use std::{
+    error::Error,
+    path::{Path, PathBuf},
+};
 use std::{fs, fs::File};
 
 const LOCAL_REPO_PATH: &str = "/var/lib/solbuild/local";
 
 /// Copies any eopkg files in the current directory to the local solbuild
 /// repo. This does not index the repo afterwards.
-fn copy_packages(current_dir: PathBuf) -> SolResult<()> {
+fn copy_packages() -> SolResult<()> {
     let mut packages = Vec::new();
 
     println!("Looking for packages to copy...");
-    let search = format!("{}/*.eopkg", current_dir.to_str().unwrap_or("."));
-    for entry in glob(&search).unwrap() {
+    for entry in glob("*.eopkg").unwrap() {
         match entry {
             Ok(path) => {
                 println!(
@@ -63,6 +65,26 @@ fn clean_local_repo() -> SolResult<()> {
     }
 }
 
+fn clone_repo<P: AsRef<Path>>(current_dir: P, package: &str) -> SolResult<()> {
+    // Check that we're in the root packaging directory where `common` lives
+    let mut common_path = PathBuf::new();
+    common_path.push(&current_dir);
+    common_path.push("common");
+
+    if fs::metadata(&common_path).is_err() {
+        return Err(SolError::Other(
+            "not in packaging root directory: 'common' not found",
+        ));
+    }
+
+    // Clone the repo
+    let url = format!("https://dev.getsol.us/source/{}.git", package);
+    match Repository::clone(&url, &package) {
+        Ok(_) => Ok(()),
+        Err(e) => Err(SolError::Git(e)),
+    }
+}
+
 /// Indexes the packages in the local solbuild repository.
 fn index_repo() -> SolResult<()> {
     let status = Command::new("eopkg")
@@ -78,7 +100,7 @@ fn index_repo() -> SolResult<()> {
     }
 }
 
-fn init_repo(current_dir: PathBuf, name: &str, source_url: &str) -> SolResult<()> {
+fn init_repo<P: AsRef<Path>>(current_dir: P, name: &str, source_url: &str) -> SolResult<()> {
     // Check that we're in the root packaging directory where `common` lives
     let mut common_path = PathBuf::new();
     common_path.push(&current_dir);
@@ -139,15 +161,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         "copy" => {
             sudo::escalate_if_needed()?;
 
-            let current_dir = match env::current_dir() {
-                Ok(dir) => dir,
-                Err(e) => {
-                    eprintln!("Error getting current working directory: {}", e);
-                    process::exit(1);
-                }
-            };
-
-            if let Err(e) = copy_packages(current_dir) {
+            if let Err(e) = copy_packages() {
                 eprintln!("Error copying packages to local repo: {}", e);
                 process::exit(1);
             }
@@ -171,6 +185,27 @@ fn main() -> Result<(), Box<dyn Error>> {
 
             if let Err(e) = index_repo() {
                 eprintln!("Error indexing local repo: {}", e);
+                process::exit(1);
+            }
+
+            Ok(())
+        }
+        "clone" => {
+            if args.len() != 3 {
+                eprintln!("Invalid arguments. Usage: soltools clone NAME");
+                process::exit(1);
+            }
+
+            let current_dir = match env::current_dir() {
+                Ok(dir) => dir,
+                Err(e) => {
+                    eprintln!("Error getting current working directory: {}", e);
+                    process::exit(1);
+                }
+            };
+
+            if let Err(e) = clone_repo(current_dir, &args[2]) {
+                eprintln!("Error creating new repo: {}", e);
                 process::exit(1);
             }
 
