@@ -128,7 +128,7 @@ fn init_repo<P: AsRef<Path>>(current_dir: P, name: &str, source_url: &str) -> So
     makefile_path.push("Makefile");
 
     let mut makefile = File::create(makefile_path)?;
-    makefile.write_all(b"include ../Makefile.common")?;
+    makefile.write_all(b"include ../Makefile.common\n")?;
 
     println!("\nRunning yauto.py");
 
