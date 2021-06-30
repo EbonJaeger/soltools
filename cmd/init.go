@@ -10,11 +10,13 @@ import (
 	"github.com/go-git/go-git/v5"
 )
 
+// InitArgs holds the arguments for the init command.
 type InitArgs struct {
 	Name string `desc:"Name of the package to clone"`
 	URL  string `desc:"URL of the source tarball to use"`
 }
 
+// Init is our command to initialize a new local package repository.
 var Init = cmd.Sub{
 	Name:  "init",
 	Alias: "i",
@@ -23,6 +25,7 @@ var Init = cmd.Sub{
 	Run:   InitRepo,
 }
 
+// InitRepo creates and initializes a new package repository.
 func InitRepo(root *cmd.Root, c *cmd.Sub) {
 	logger := soltools.NewLogger()
 

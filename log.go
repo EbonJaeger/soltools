@@ -9,6 +9,7 @@ import (
 	"github.com/DataDrake/waterlog/level"
 )
 
+// NewLogger initializes a Waterlog logging instance and returns it.
 func NewLogger() *waterlog.WaterLog {
 	logger := waterlog.New(os.Stdout, "", log2.Ltime)
 	logger.SetLevel(level.Info)

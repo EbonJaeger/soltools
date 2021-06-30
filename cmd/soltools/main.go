@@ -5,14 +5,10 @@ import (
 	commands "github.com/EbonJaeger/soltools/cmd"
 )
 
-type GlobalFlags struct {
-}
-
 func main() {
 	root := &cmd.Root{
 		Name:  "soltools",
 		Short: "Tool to assist with Solus packaging",
-		Flags: &GlobalFlags{},
 	}
 
 	cmd.Register(&commands.Copy)

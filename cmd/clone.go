@@ -10,17 +10,20 @@ import (
 	"github.com/go-git/go-git/v5"
 )
 
+// CloneArgs holds the arguments for the clone command.
 type CloneArgs struct {
 	Name string `desc:"Name of the package to clone"`
 }
 
+// Clone is our repo clone command.
 var Clone = cmd.Sub{
 	Name:  "clone",
-	Short: "Clone a package from the offical Solus repo.",
+	Short: "Clone a package from the official Solus repo.",
 	Args:  &CloneArgs{},
 	Run:   ClonePackage,
 }
 
+// ClonePackage clones a package repository from the upstream Solus repo.
 func ClonePackage(root *cmd.Root, c *cmd.Sub) {
 	logger := soltools.NewLogger()
 
