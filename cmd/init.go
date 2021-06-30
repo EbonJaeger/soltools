@@ -31,7 +31,7 @@ func InitRepo(root *cmd.Root, c *cmd.Sub) {
 
 	cwd, err := os.Getwd()
 	if err != nil {
-		logger.Fatalf("Unable to get current directory, %s\n", err)
+		logger.Fatalf("Unable to get current directory: %s\n", err)
 	}
 
 	if _, err = os.Stat(filepath.Join(cwd, "common")); err != nil {

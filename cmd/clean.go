@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"os/user"
 	"strings"
 
 	"github.com/DataDrake/cli-ng/v2/cmd"
@@ -17,6 +18,15 @@ var Clean = cmd.Sub{
 // CleanPackages removes all packages in the local Solbuild repo and reindexes it.
 func CleanPackages(root *cmd.Root, c *cmd.Sub) {
 	logger := soltools.NewLogger()
+
+	user, err := user.Current()
+	if err != nil {
+		logger.Fatalf("Unable to check for root privileges: %s\n", err)
+	}
+	if user.Name != "root" {
+		logger.Fatalln("This command must be run with elevated privileges")
+	}
+
 	logger.Infoln("Looking for packages to clean")
 
 	cleaned, err := soltools.CleanRepo()
