@@ -26,8 +26,7 @@ func CopyPackage(path string) error {
 	}
 	defer dest.Close()
 
-	err = os.Chmod(destPath, 0644)
-	if err != nil {
+	if err = os.Chmod(destPath, 0644); err != nil {
 		return err
 	}
 

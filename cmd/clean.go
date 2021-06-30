@@ -38,8 +38,7 @@ func CleanPackages(root *cmd.Root, c *cmd.Sub) {
 	}
 
 	logger.Infoln("Indexing local repo")
-	err = soltools.IndexRepo()
-	if err != nil {
+	if err = soltools.IndexRepo(); err != nil {
 		logger.Fatalf("Error indexing local repo: %s\n", err)
 	} else {
 		logger.Goodln("Indexed local repo")

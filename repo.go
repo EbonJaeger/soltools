@@ -17,8 +17,7 @@ func CleanRepo() (removed []string, err error) {
 
 	for _, pkg := range packages {
 		path := filepath.Join(LocalRepo, pkg)
-		err = os.Remove(path)
-		if err != nil {
+		if err = os.Remove(path); err != nil {
 			return
 		}
 		removed = append(removed, pkg)
