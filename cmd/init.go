@@ -43,9 +43,6 @@ func InitRepo(root *cmd.Root, c *cmd.Sub) {
 	}
 
 	name := c.Args.(*InitArgs).Name
-	if len(name) == 0 {
-		logger.Fatalln("Package name is empty!")
-	}
 	path := filepath.Join(cwd, name)
 
 	logger.Infoln("Creating git repo")
@@ -55,7 +52,7 @@ func InitRepo(root *cmd.Root, c *cmd.Sub) {
 	}
 	logger.Goodln("Git repo created")
 
-	logger.Infoln("Writing Makefile in repo")
+	logger.Infoln("Creating Makefile in the repo")
 	makefile, err := os.Create(filepath.Join(path, "Makefile"))
 	if err != nil {
 		logger.Fatalf("Error creating Makefile: %s\n", err)
@@ -67,11 +64,11 @@ func InitRepo(root *cmd.Root, c *cmd.Sub) {
 	}
 	logger.Goodln("Makefile written")
 
-	logger.Infoln("Running yauto.py")
+	logger.Infoln("Running yauto.py to generate package.yml")
 	cmd := exec.Command(filepath.Join(cwd, "common", "Scripts", "yauto.py"), c.Args.(*InitArgs).URL)
 	cmd.Dir = path
 	if err = cmd.Run(); err != nil {
-		logger.Fatalf("Error initialzing package.yml: %s", err)
+		logger.Fatalf("Error generating package.yml: %s", err)
 	} else {
 		logger.Goodln("Package repo initialized")
 	}

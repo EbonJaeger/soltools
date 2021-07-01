@@ -41,9 +41,6 @@ func ClonePackage(root *cmd.Root, c *cmd.Sub) {
 	}
 
 	name := c.Args.(*CloneArgs).Name
-	if len(name) == 0 {
-		logger.Fatalln("Package name is empty!")
-	}
 	path := filepath.Join(cwd, name)
 
 	logger.Infoln("Cloning Solus package")
