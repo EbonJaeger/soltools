@@ -9,16 +9,15 @@ A small tool to make packaging for Solus even easier.
 - Initialize a new package repo
 - Clone an existing package repo
 
+## Installation
+
+To install or update to the latest version, run `go get github.com/EbonJaeger/soltools`
+
 ## Usage
 
-`./soltools subcommand`
+`soltools subcommand ARGS`
 
-Available subcommands:
-
-- `clean`
-- `copy`
-- `init NAME SOURCE_ARCHIVE_URL`
-- `clone NAME`
+Running just `soltools` will print the usage information.
 
 ## License
 
