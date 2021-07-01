@@ -3,7 +3,6 @@ package cmd
 import (
 	"io/fs"
 	"os"
-	"os/user"
 	"path/filepath"
 	"strings"
 
@@ -24,12 +23,8 @@ var Copy = cmd.Sub{
 func CopyPackages(root *cmd.Root, c *cmd.Sub) {
 	logger := soltools.NewLogger()
 
-	user, err := user.Current()
-	if err != nil {
-		logger.Fatalf("Unable to check for root privileges: %s\n", err)
-	}
-	if user.Name != "root" {
-		logger.Fatalln("This command must be run with elevated privileges")
+	if err := soltools.EscalateIfNeeded(); err != nil {
+		logger.Fatalf("Unable to escalate privileges: %s\n", err)
 	}
 
 	cwd, err := os.Getwd()
