@@ -11,7 +11,7 @@ A small tool to make packaging for Solus even easier.
 
 ## Installation
 
-To install or update to the latest version, run `go get github.com/EbonJaeger/soltools`
+To install or update to the latest version, run `go get github.com/EbonJaeger/soltools/cmd/soltools`
 
 ## Usage
 
