@@ -49,7 +49,7 @@ func CopyPackages(root *cmd.Root, c *cmd.Sub) {
 	logger.Printf("\t- %s\n", strings.Join(packages, "\n\t- "))
 
 	for _, eopkg := range packages {
-		err = repo.CopyPackage(filepath.Join(cwd, eopkg))
+		err = repo.CopyInto(filepath.Join(cwd, eopkg))
 		if err != nil {
 			logger.Errorf("Error copying package '%s': %s\n", eopkg, err)
 			continue
