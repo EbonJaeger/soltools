@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 )
 
-// LocalRepo is the path to the local Solbuild repo.
+// LocalPath is the path to the local Solbuild repo.
 const LocalPath = "/var/lib/solbuild/local"
 
 // Clean removes all package files in the local Solbuild repo.
