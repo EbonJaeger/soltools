@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 
 	"github.com/DataDrake/cli-ng/v2/cmd"
-	"github.com/EbonJaeger/soltools"
 	"github.com/go-git/go-git/v5"
 )
 
@@ -27,7 +26,7 @@ var Init = cmd.Sub{
 
 // InitRepo creates and initializes a new package repository.
 func InitRepo(root *cmd.Root, c *cmd.Sub) {
-	logger := soltools.NewLogger()
+	logger := NewLogger()
 
 	cwd, err := os.Getwd()
 	if err != nil {

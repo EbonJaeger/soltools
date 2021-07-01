@@ -7,7 +7,8 @@ import (
 	"strings"
 
 	"github.com/DataDrake/cli-ng/v2/cmd"
-	"github.com/EbonJaeger/soltools"
+	"github.com/EbonJaeger/soltools/internal/permission"
+	"github.com/EbonJaeger/soltools/repo"
 )
 
 // Copy is the copy subcommand.
@@ -21,9 +22,9 @@ var Copy = cmd.Sub{
 // CopyPackages copies any eopkg file in the current repo to the local Solbuild
 // repo, and indexes the repo after.
 func CopyPackages(root *cmd.Root, c *cmd.Sub) {
-	logger := soltools.NewLogger()
+	logger := NewLogger()
 
-	if err := soltools.EscalateIfNeeded(); err != nil {
+	if err := permission.EscalateIfNeeded(); err != nil {
 		logger.Fatalf("Unable to escalate privileges: %s\n", err)
 	}
 
@@ -48,7 +49,7 @@ func CopyPackages(root *cmd.Root, c *cmd.Sub) {
 	logger.Printf("\t- %s\n", strings.Join(packages, "\n\t- "))
 
 	for _, eopkg := range packages {
-		err = soltools.CopyPackage(filepath.Join(cwd, eopkg))
+		err = repo.CopyPackage(filepath.Join(cwd, eopkg))
 		if err != nil {
 			logger.Errorf("Error copying package '%s': %s\n", eopkg, err)
 			continue
@@ -56,7 +57,7 @@ func CopyPackages(root *cmd.Root, c *cmd.Sub) {
 	}
 
 	logger.Infoln("Indexing local repo")
-	if err = soltools.IndexRepo(); err != nil {
+	if err = repo.Index(); err != nil {
 		logger.Fatalf("Error indexing local repo: %s\n", err)
 	} else {
 		logger.Goodln("Local repo indexed")

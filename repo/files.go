@@ -1,4 +1,4 @@
-package soltools
+package repo
 
 import (
 	"io"
@@ -7,7 +7,7 @@ import (
 )
 
 // LocalRepo is the path to the local Solbuild repo.
-const LocalRepo = "/var/lib/solbuild/local"
+const LocalPath = "/var/lib/solbuild/local"
 
 // CopyPackage copies an eopkg archive to the local Solbuild repo.
 func CopyPackage(path string) error {
@@ -19,7 +19,7 @@ func CopyPackage(path string) error {
 	}
 	defer src.Close()
 
-	destPath := filepath.Join(LocalRepo, name)
+	destPath := filepath.Join(LocalPath, name)
 	dest, err := os.Create(destPath)
 	if err != nil {
 		return err

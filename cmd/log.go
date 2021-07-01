@@ -1,4 +1,4 @@
-package soltools
+package cmd
 
 import (
 	log2 "log"

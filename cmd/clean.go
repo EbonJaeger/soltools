@@ -4,7 +4,8 @@ import (
 	"strings"
 
 	"github.com/DataDrake/cli-ng/v2/cmd"
-	"github.com/EbonJaeger/soltools"
+	"github.com/EbonJaeger/soltools/internal/permission"
+	"github.com/EbonJaeger/soltools/repo"
 )
 
 // Clean is the clean subcommand.
@@ -16,15 +17,15 @@ var Clean = cmd.Sub{
 
 // CleanPackages removes all packages in the local Solbuild repo and reindexes it.
 func CleanPackages(root *cmd.Root, c *cmd.Sub) {
-	logger := soltools.NewLogger()
+	logger := NewLogger()
 
-	if err := soltools.EscalateIfNeeded(); err != nil {
+	if err := permission.EscalateIfNeeded(); err != nil {
 		logger.Fatalf("Unable to escalate privileges: %s\n", err)
 	}
 
 	logger.Infoln("Looking for packages to clean")
 
-	cleaned, err := soltools.CleanRepo()
+	cleaned, err := repo.Clean()
 	if err != nil {
 		logger.Errorf("Error cleaning packages: %s\n", err)
 	} else {
@@ -33,7 +34,7 @@ func CleanPackages(root *cmd.Root, c *cmd.Sub) {
 	}
 
 	logger.Infoln("Indexing local repo")
-	if err = soltools.IndexRepo(); err != nil {
+	if err = repo.Index(); err != nil {
 		logger.Fatalf("Error indexing local repo: %s\n", err)
 	} else {
 		logger.Goodln("Local repo indexed")

@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 
 	"github.com/DataDrake/cli-ng/v2/cmd"
-	"github.com/EbonJaeger/soltools"
 	"github.com/go-git/go-git/v5"
 )
 
@@ -25,7 +24,7 @@ var Clone = cmd.Sub{
 
 // ClonePackage clones a package repository from the upstream Solus repo.
 func ClonePackage(root *cmd.Root, c *cmd.Sub) {
-	logger := soltools.NewLogger()
+	logger := NewLogger()
 
 	cwd, err := os.Getwd()
 	if err != nil {

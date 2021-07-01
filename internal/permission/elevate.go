@@ -1,4 +1,4 @@
-package soltools
+package permission
 
 import (
 	"os"
