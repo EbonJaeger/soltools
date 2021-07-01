@@ -18,7 +18,7 @@ type CloneArgs struct {
 // Clone is our repo clone command.
 var Clone = cmd.Sub{
 	Name:  "clone",
-	Short: "Clone a package from the official Solus repo.",
+	Short: "Clone a package from the official Solus repo",
 	Args:  &CloneArgs{},
 	Run:   ClonePackage,
 }
@@ -43,7 +43,7 @@ func ClonePackage(root *cmd.Root, c *cmd.Sub) {
 	name := c.Args.(*CloneArgs).Name
 	path := filepath.Join(cwd, name)
 
-	logger.Infoln("Cloning Solus package")
+	logger.Infoln("Cloning Solus package repository")
 
 	_, err = git.PlainClone(path, false, &git.CloneOptions{
 		URL:      fmt.Sprintf("https://dev.getsol.us/source/%s.git", name),

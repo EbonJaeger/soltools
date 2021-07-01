@@ -14,7 +14,7 @@ import (
 var Copy = cmd.Sub{
 	Name:  "copy",
 	Alias: "c",
-	Short: "Copies .eopkg files to the local repo and indexes",
+	Short: "Copies .eopkg files to the local repo and re-indexes",
 	Run:   CopyPackages,
 }
 
@@ -59,6 +59,6 @@ func CopyPackages(root *cmd.Root, c *cmd.Sub) {
 	if err = soltools.IndexRepo(); err != nil {
 		logger.Fatalf("Error indexing local repo: %s\n", err)
 	} else {
-		logger.Goodln("Indexed local repo")
+		logger.Goodln("Local repo indexed")
 	}
 }

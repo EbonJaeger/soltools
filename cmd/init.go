@@ -20,7 +20,7 @@ type InitArgs struct {
 var Init = cmd.Sub{
 	Name:  "init",
 	Alias: "i",
-	Short: "Initializes a new package repo.",
+	Short: "Initializes a new package repo",
 	Args:  &InitArgs{},
 	Run:   InitRepo,
 }
