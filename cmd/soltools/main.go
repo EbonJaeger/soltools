@@ -13,7 +13,6 @@ func main() {
 
 	cmd.Register(&commands.Copy)
 	cmd.Register(&commands.Clean)
-	cmd.Register(&commands.Clone)
 	cmd.Register(&commands.Init)
 
 	root.Run()
