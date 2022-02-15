@@ -21,6 +21,6 @@ Running just `soltools` will print the usage information.
 
 ## License
 
-Copyright &copy; 2021 Evan Maddock maddock.evan@vivaldi.net
+Copyright &copy; 2021-2022 Evan Maddock maddock.evan@vivaldi.net
 
 `soltools` is available under the terms of the Apache 2.0 license.
