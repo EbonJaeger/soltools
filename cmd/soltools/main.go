@@ -27,6 +27,7 @@ type InitArgs struct {
 	URL  string `desc:"URL of the source tarball to use"`
 }
 
+// InitFlags holds the flags for the init command.
 type InitFlags struct {
 	SkipMaintainers bool `long:"skip-maintainers" desc:"Skip creating a MAINTAINERS.md file for this repository"`
 }
