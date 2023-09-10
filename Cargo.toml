@@ -1,0 +1,11 @@
+[package]
+name = "soltools"
+version = "3.0.0"
+authors = ["Evan Maddock <maddock.evan@vivaldi.net>"]
+description = "Tool to make Solus packaging even easier."
+license = "Apache-2.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
