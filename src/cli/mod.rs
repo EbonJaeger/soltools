@@ -1,6 +1,7 @@
 use clap::{Parser, Subcommand};
 use thiserror::Error;
 
+mod copy;
 mod init;
 
 #[derive(Parser)]
@@ -12,6 +13,12 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
+    /// Copy eopkg files to the local Solbuild repo
+    Copy {
+        /// Index the local repository after copying
+        #[arg(short, long)]
+        index: bool,
+    },
     /// Initialize a new package repository
     Init {
         /// Name of the package
@@ -28,6 +35,9 @@ pub fn process() -> Result<(), Error> {
     let cli = Cli::parse();
 
     match &cli.command {
+        Some(Commands::Copy { index }) => {
+            copy::handle(*index)?;
+        }
         Some(Commands::Init {
             name,
             url,
@@ -43,6 +53,8 @@ pub fn process() -> Result<(), Error> {
 
 #[derive(Debug, Error)]
 pub enum Error {
+    #[error("Package copy error")]
+    Copy(#[from] copy::Error),
     #[error("Package init error")]
     Init(#[from] init::Error),
 }
