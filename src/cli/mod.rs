@@ -13,15 +13,27 @@ struct Cli {
 #[derive(Subcommand)]
 enum Commands {
     /// Initialize a new package repository
-    Init { name: String, url: String },
+    Init {
+        /// Name of the package
+        name: String,
+        /// URL to the source tarball
+        url: String,
+        /// Create a maintainers file for this package
+        #[arg(short, long)]
+        maintain: bool,
+    },
 }
 
 pub fn process() -> Result<(), Error> {
     let cli = Cli::parse();
 
     match &cli.command {
-        Some(Commands::Init { name, url }) => {
-            init::handle(name.to_string(), url.to_string())?;
+        Some(Commands::Init {
+            name,
+            url,
+            maintain,
+        }) => {
+            init::handle(name.to_string(), url.to_string(), *maintain)?;
         }
         None => {}
     }
