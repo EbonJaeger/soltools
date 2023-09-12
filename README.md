@@ -7,17 +7,16 @@ A small tool to make packaging for Solus even easier.
 - Remove all packages from the local solbuild repo.
 - Copy eopkg files to the default local repo and re-index the repo.
 - Initialize a new package repo
-- Clone an existing package repo
 
 ## Installation
 
-To install or update to the latest version, run `go get github.com/EbonJaeger/soltools/cmd/soltools`
+To install, clone the repository and run `cargo build`. Or grab the latest release from the [Releases](https://github.com/EbonJaeger/soltools/releases) page.
 
 ## Usage
 
-`soltools subcommand ARGS`
+`soltools [COMMAND] [ARGS]`
 
-Running just `soltools` will print the usage information.
+Running `soltools help` will print the usage information.
 
 ## License
 
