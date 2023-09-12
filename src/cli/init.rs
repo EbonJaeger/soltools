@@ -33,7 +33,7 @@ pub fn handle(name: String, url: String, maintain: bool) -> Result<(), Error> {
 
     // Run yauto.py
     let yauto_path = Path::new(&current).join("common/Scripts/yauto.py");
-    Command::new(&yauto_path)
+    Command::new(yauto_path)
         .arg(&url)
         .current_dir(package_dir)
         .output()?;
